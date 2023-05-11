@@ -19,13 +19,16 @@ app.use(basicAuth({
 app.post('/send_sms', 
     body('destination_number')
         .isLength({ min: 11, max: 11 })
+        .notEmpty()
         .custom((value) => {
-            if (!value.startsWith('+591')) {
-                throw new Error('destination_number must start with +591');
+            if (!value.startsWith('591')) {
+                throw new Error('destination_number must start with 591');
             }
             return true;
         }),
-    body('message').isLength({ max: 160 }),
+    body('message')
+        .isLength({ max: 160 })
+        .notEmpty(),
     (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -35,7 +38,11 @@ app.post('/send_sms',
         const destinationNumber = req.body.destination_number;
         const message = req.body.message;
 
-        const command = `${process.env.GAMMU_COMMAND} sendsms TEXT ${destinationNumber} -text "${message}"`;
+        if (!process.env.GAMMU_COMMAND) {
+            return res.status(500).json({ error: 'GAMMU_COMMAND is not set in environment variables.' });
+        }
+
+        const command = `${process.env.GAMMU_COMMAND} TEXT ${destinationNumber} -text "${message}"`;
 
         exec(command, (err, stdout, stderr) => {
             if (err) {
@@ -49,7 +56,6 @@ app.post('/send_sms',
         });
     }
 );
-
 
 const PORT = process.env.SERVER_PORT || 3000;
 app.listen(PORT, () => {
