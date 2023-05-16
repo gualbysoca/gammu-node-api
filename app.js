@@ -31,8 +31,8 @@ app.post('/send_sms',
         .isLength({ min: 11, max: 11 })
         .notEmpty()
         .custom((value) => {
-            if (!value.startsWith('+591')) {
-                throw new Error('destination_number must start with +591');
+            if (!value.startsWith('591')) {
+                throw new Error('destination_number must start with 591');
             }
             return true;
         }),
