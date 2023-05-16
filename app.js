@@ -54,7 +54,7 @@ app.post('/send_sms',
             return res.status(500).json({ error: 'GAMMU_COMMAND is not set in environment variables.' });
         }
 
-        const command = `${process.env.GAMMU_COMMAND} sendsms TEXT ${destinationNumber} -text "${message}"`;
+        const command = `${process.env.GAMMU_COMMAND} TEXT ${destinationNumber} -text "${message}"`;
 
         exec(command, (err, stdout, stderr) => {
             if (err) {
